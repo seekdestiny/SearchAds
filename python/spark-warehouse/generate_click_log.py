@@ -412,7 +412,7 @@ if __name__ == "__main__":
             else:
                 #negative_type sample
                 for entry in ad_list:
-                    if entry["query_group_id"] == query_group_id:
+                    if entry["queryGroupId"] == query_group_id:
                         negative_type = weighted_sampling(negative_types)
                         fields = negative_sampling(ip, level_2_user[ip][0], entry,query_camp_ad,campaign_weight,ad_weight,campaignId_category,campaignId_adId,negative_type)
                         if valid(fields) == False :
