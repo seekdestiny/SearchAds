@@ -25,6 +25,8 @@ install mysql-workbench
 python ../../python/spark-warehouse/generate_word2vec_training_data.py ../deduped/clean_ads.txt word2vec_training_cleaned.txt
 
 python ../../python/spark-warehouse/word2vec.py word2vec_training_cleaned.txt word2vec_training.txt
+
+python generate_synonmy.py ../../data/log/word2vec_training.txt ../../data/deduped/clean_ads.txt
 ```
 
 ```sql
