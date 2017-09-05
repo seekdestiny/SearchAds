@@ -52,7 +52,9 @@ public class SearchAds extends HttpServlet {
 	    String mysqlUser = application.getInitParameter("mysqlUser");
 	    String mysqlPass = application.getInitParameter("mysqlPass");
 	    int memcachedPortal = Integer.parseInt(application.getInitParameter("memcachedPortal"));
-		this.adsEngine = new AdsEngine(adsDataFilePath,budgetDataFilePath,memcachedServer,memcachedPortal,mysqlHost,mysqlDb,mysqlUser,mysqlPass);
+	    int synonymsMemcachedPortal = Integer.parseInt(application.getInitParameter("synonymsMemcachedPortal"));
+		this.adsEngine = new AdsEngine(adsDataFilePath, budgetDataFilePath, memcachedServer, memcachedPortal, synonymsMemcachedPortal,
+				mysqlHost, mysqlDb, mysqlUser, mysqlPass);
 		this.adsEngine.init();  
 		System.out.println("adsEngine initilized");
 		//load UI template

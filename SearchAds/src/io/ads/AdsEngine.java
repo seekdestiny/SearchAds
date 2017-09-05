@@ -2,9 +2,10 @@ package io.ads;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.json.*;
 
@@ -14,21 +15,27 @@ public class AdsEngine {
 	private IndexBuilder indexBuilder;
 	private String mMemcachedServer;
 	private int mMemcachedPortal;
+	private int mSynonymsMemcachedPortal;
 	private String mysql_host;
 	private String mysql_db;
 	private String mysql_user;
 	private String mysql_pass;
+	private boolean enable_query_rewrite;
 	
-	public AdsEngine(String adsDataFilePath, String budgetDataFilePath,String memcachedServer,int memcachedPortal,String mysqlHost,String mysqlDb,String user,String pass)
+	public AdsEngine(String adsDataFilePath, String budgetDataFilePath, String memcachedServer,
+			int memcachedPortal, int synonymsMemcachedPortal, String mysqlHost, String mysqlDb,
+			String user, String pass)
 	{
 		mAdsDataFilePath = adsDataFilePath;
 		mBudgetFilePath = budgetDataFilePath;
 		mMemcachedServer = memcachedServer;
 		mMemcachedPortal = memcachedPortal;
+		mSynonymsMemcachedPortal = synonymsMemcachedPortal;
 		mysql_host = mysqlHost;
 		mysql_db = mysqlDb;	
 		mysql_user = user;
-		mysql_pass = pass;	
+		mysql_pass = pass;
+		enable_query_rewrite = false;
 		indexBuilder = new IndexBuilder(memcachedServer,memcachedPortal,mysql_host,mysql_db,mysql_user,mysql_pass);
 	}
 	
@@ -92,12 +99,60 @@ public class AdsEngine {
 		return true;
 	}
 	
-	public List<Ad> selectAds(String query)
+	public List<Ad> selectAds1(String query)
 	{
 		//query understanding
 		List<String> queryTerms = QueryParser.getInstance().QueryUnderstand(query);
 		//select ads candidates
 		List<Ad> adsCandidates = AdsSelector.getInstance(mMemcachedServer, mMemcachedPortal,mysql_host, mysql_db,mysql_user, mysql_pass).selectAds(queryTerms);		
+		//L0 filter by pClick, relevance score
+		List<Ad> L0unfilteredAds = AdsFilter.getInstance().LevelZeroFilterAds(adsCandidates);
+		System.out.println("L0unfilteredAds ads left = " + L0unfilteredAds.size());
+
+		//L1 filter by relevance score : select top K ads
+		int k = 20;
+		List<Ad> unfilteredAds = AdsFilter.getInstance().LevelOneFilterAds(L0unfilteredAds,k);
+		System.out.println("unfilteredAds ads left = " + unfilteredAds.size());
+
+		//Dedupe ads per campaign
+		List<Ad> dedupedAds = AdsCampaignManager.getInstance(mysql_host, mysql_db,mysql_user, mysql_pass).DedupeByCampaignId(unfilteredAds);
+		System.out.println("dedupedAds ads left = " + dedupedAds.size());
+
+		List<Ad> ads = AdsCampaignManager.getInstance(mysql_host, mysql_db,mysql_user, mysql_pass).ApplyBudget(dedupedAds);
+		System.out.println("AdsCampaignManager ads left = " + ads.size());
+
+		//allocation
+		AdsAllocation.getInstance().AllocateAds(ads);
+		return ads;
+	}
+	
+	
+	public List<Ad> selectAds(String query)
+	{
+		//query understanding
+		List<Ad> adsCandidates = new ArrayList<Ad>();
+		if (enable_query_rewrite) {
+			List<List<String>> rewrittenQuery = QueryParser.getInstance().QueryRewrite(query, mMemcachedServer, mSynonymsMemcachedPortal);
+			Set<Long> uniqueAds = new HashSet<Long>();
+			//select ads candidates
+			for (List<String> queryTerms: rewrittenQuery) {
+				List<Ad> adsCandidates_temp = AdsSelector.getInstance(mMemcachedServer, mMemcachedPortal, 
+						mysql_host, mysql_db,mysql_user, mysql_pass).selectAds(queryTerms);		
+						
+				for (Ad ad : adsCandidates_temp) {
+					if (!uniqueAds.contains(ad.adId)) {
+						adsCandidates.add(ad);
+					}
+				}
+			}
+			//TODO: give ads selected by rewritten query lower rank score
+		} else {
+			List<String> queryTerms = QueryParser.getInstance().QueryUnderstand(query);
+			//select ads candidates
+			adsCandidates = AdsSelector.getInstance(mMemcachedServer, mMemcachedPortal,mysql_host, mysql_db, 
+					mysql_user, mysql_pass).selectAds(queryTerms);		
+		}
+			
 		//L0 filter by pClick, relevance score
 		List<Ad> L0unfilteredAds = AdsFilter.getInstance().LevelZeroFilterAds(adsCandidates);
 		System.out.println("L0unfilteredAds ads left = " + L0unfilteredAds.size());

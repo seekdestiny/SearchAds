@@ -36,6 +36,16 @@
 </context-param>
 
 <context-param>
+<param-name>featureMemcachedPortal</param-name>
+<param-value>11218</param-value>
+</context-param>
+
+<context-param>
+<param-name>synonymsMemcachedPortal</param-name>
+<param-value>11219</param-value>
+</context-param>
+
+<context-param>
 <param-name>mysqlHost</param-name>
 <param-value>127.0.0.1:3306</param-value>
 </context-param>

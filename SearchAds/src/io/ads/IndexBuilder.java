@@ -5,7 +5,9 @@ import java.io.StringReader;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
+import java.util.HashMap;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
@@ -70,6 +72,54 @@ public class IndexBuilder {
 		return true;
 	}
 	
+	public Boolean buildPositionInvertIndex(Ad ad) {
+		try 
+		{
+			String keyWords = Utility.strJoin(ad.keyWords, ",");
+			MemcachedClient cache = new MemcachedClient(new InetSocketAddress(mMemcachedServer, mMemcachedPortal));	
+			List<String> tokens = Utility.cleanedTokenize(keyWords);
+			//key: AdID, value: list<position>
+			//HashMap<Long, List<Intger>> positionIndex = new HashMap<Long, List<Integer>>();
+			
+			for(int i = 0; i < tokens.size();i++)
+			{
+				String key = tokens.get(i);
+				if(cache.get(key) instanceof Set)
+				{
+					@SuppressWarnings("unchecked")
+					PositionIndexItem positionIndexItem = (PositionIndexItem)cache.get(key);
+					positionIndexItem.term_count = positionIndexItem.term_count + 1;
+					if (positionIndexItem.positionIndex.containsKey(ad.adId)) {
+						positionIndexItem.positionIndex.get(ad.adId).add(i);
+					} else {
+						List<Integer> position_list = new ArrayList<Integer>();
+						position_list.add(i);
+						positionIndexItem.positionIndex.put(ad.adId, position_list);
+					}
+					
+				    cache.set(key, EXP, positionIndexItem);
+				}
+				else
+				{
+					PositionIndexItem positionIndexItem = new PositionIndexItem();
+					positionIndexItem.term_count = 1;
+					positionIndexItem.positionIndex = new HashMap<Long, List<Integer>>();
+					List<Integer> position_list = new ArrayList<Integer>();
+					position_list.add(i);
+					positionIndexItem.positionIndex.put(ad.adId, position_list);
+					cache.set(key, EXP, positionIndexItem);
+				}
+			}
+			cache.shutdown();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
 	public Boolean buildForwardIndex(Ad ad)
 	{
 		try 
@@ -84,6 +134,7 @@ public class IndexBuilder {
 		}		
 		return true;
 	}
+	
 	public Boolean updateBudget(Campaign camp)
 	{
 		try 

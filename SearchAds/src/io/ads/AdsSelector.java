@@ -26,12 +26,14 @@ public class AdsSelector {
 		mysql_user = user;
 		mysql_pass = pass;
 	}
+	
 	public static AdsSelector getInstance(String memcachedServer,int memcachedPortal,String mysqlHost,String mysqlDb,String user,String pass) {
 	      if(instance == null) {
 	         instance = new AdsSelector(memcachedServer, memcachedPortal,mysqlHost,mysqlDb,user,pass);
 	      }
 	      return instance;
     }
+	
 	public List<Ad> selectAds(List<String> queryTerms)
 	{
 		List<Ad> adList = new ArrayList<Ad>();

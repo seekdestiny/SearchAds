@@ -20,18 +20,21 @@ public class AdsServer {
 	public static void main(String[] args) throws IOException {
 		if(args.length < 4)
 		{
-			System.out.println("Usage: AdsServer <adsDataFilePath> <budgetDataFilePath> <memcachedServer> <memcachedPortal>");
+			System.out.println("Usage: AdsServer <adsDataFilePath> <budgetDataFilePath> <memcachedServer> <memcachedPortal> "
+					+ "<synonymsMemcachedPortal>");
 			System.exit(0);
 		}
 		String adsDataFilePath = args[0];
 		String budgetDataFilePath = args[1];
 		String memcachedServer = args[2];
 		int memcachedPortal = Integer.parseInt(args[3]);
+		int synonymsMemcachedPortal = Integer.parseInt(args[4]);
 		String mysql_host = "127.0.0.1:3306";
 		String mysql_db = "searchads";
-		String mysql_user = "root";
-		String mysql_pass = "bittiger2017";
-		AdsEngine adsEngine = new AdsEngine(adsDataFilePath,budgetDataFilePath,memcachedServer,memcachedPortal,mysql_host,mysql_db,mysql_user,mysql_pass);
+		String mysql_user = "jifeiqian";
+		String mysql_pass = "Qx6y123Y@";
+		AdsEngine adsEngine = new AdsEngine(adsDataFilePath, budgetDataFilePath, memcachedServer, memcachedPortal, synonymsMemcachedPortal, 
+				mysql_host, mysql_db, mysql_user, mysql_pass);
 		if(adsEngine.init())
 		{
 			System.out.println("Ready to take quey");
