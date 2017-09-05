@@ -9,6 +9,8 @@ python ../../python/spark-warehouse/dedupe_ads.py ../crawled/ads.txt clean_ads1.
 
 python generate_user.py user_small.txt
 
+python generate_budget.py budget.txt
+
 python ../python/spark-warehouse/generate_query_ad.py ../data/deduped/clean_ads.txt query_camp_ad_file.json campaign_weight_file.json ad_weight_file.json query_group_id_query_file.json campaignId_category_file.json campaignId_adId_file.json
 
 python ../python/spark-warehouse/generate_click_log.py ../data/deduped/clean_ads.txt ../data/log/user_small.txt query_camp_ad_file.json campaign_weight_file.json ad_weight_file.json campaignId_category_file.json campaignId_adId_file.json click_log_small.txt
@@ -20,6 +22,9 @@ install mysql-connector for java
 
 install mysql-workbench
 
+python ../../python/spark-warehouse/generate_word2vec_training_data.py ../deduped/clean_ads.txt word2vec_training_cleaned.txt
+
+python ../../python/spark-warehouse/word2vec.py word2vec_training_cleaned.txt word2vec_training.txt
 ```
 
 ```sql
