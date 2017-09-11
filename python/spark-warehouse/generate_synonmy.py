@@ -5,10 +5,10 @@ import random
 from sets import Set
 import libmc
 from libmc import (
-    MC_HASH_MD5, MC_POLL_TIMEOUT, MC_CONNECT_TIMEOUT, MC_RETRY_TIMEOUT
+    MC_HASH_MD5, MC_HASH_FNV1_32, MC_HASH_FNV1A_32, MC_HASH_CRC_32, MC_POLL_TIMEOUT, MC_CONNECT_TIMEOUT, MC_RETRY_TIMEOUT
 )
 mc = libmc.Client(
-["127.0.0.1:11219"],comp_threshold=0, noreply=False, prefix=None,hash_fn=MC_HASH_MD5, failover=False
+["127.0.0.1:11219"],comp_threshold=0, noreply=False, prefix=None,hash_fn=MC_HASH_FNV1_32, failover=False
 )
 mc.config(MC_POLL_TIMEOUT, 100)  # 100 ms
 mc.config(MC_CONNECT_TIMEOUT, 300)  # 300 ms
@@ -68,4 +68,7 @@ if __name__ == "__main__":
                 unique_synonyms.add(synonym)
                 final_synonyms.append(synonym)
 
+        print (query_key + '\n')
+        print (final_synonyms)
+        print ('\n')
         mc.set(query_key, final_synonyms)
