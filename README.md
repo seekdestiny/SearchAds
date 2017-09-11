@@ -31,6 +31,8 @@ memcached -p 11219 -l 127.0.0.1 -d
 python generate_synonmy.py ../../data/log/word2vec_training.txt ../../data/deduped/clean_ads.txt
 
 python select_feature.py ../../simpleads/click_log_small.txt
+
+python store_ctr_feature.py
 ```
 
 ```sql
