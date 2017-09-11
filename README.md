@@ -26,7 +26,11 @@ python ../../python/spark-warehouse/generate_word2vec_training_data.py ../dedupe
 
 python ../../python/spark-warehouse/word2vec.py word2vec_training_cleaned.txt word2vec_training.txt
 
+memcached -p 11219 -l 127.0.0.1 -d
+
 python generate_synonmy.py ../../data/log/word2vec_training.txt ../../data/deduped/clean_ads.txt
+
+python select_feature.py ../../simpleads/click_log_small.txt
 ```
 
 ```sql
