@@ -35,7 +35,7 @@ public class AdsEngine {
 		mysql_db = mysqlDb;	
 		mysql_user = user;
 		mysql_pass = pass;
-		enable_query_rewrite = false;
+		enable_query_rewrite = true;
 		indexBuilder = new IndexBuilder(memcachedServer,memcachedPortal,mysql_host,mysql_db,mysql_user,mysql_pass);
 	}
 	

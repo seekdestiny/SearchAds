@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.HashAlgorithm;
+import net.spy.memcached.DefaultHashAlgorithm;
+import net.spy.memcached.ConnectionFactoryBuilder;
 import java.net.InetSocketAddress;
 
 public class QueryParser {
@@ -28,7 +31,13 @@ public class QueryParser {
 		List<String> tokens = Utility.cleanedTokenize(query);
 		String query_key = Utility.strJoin(tokens, "_");
 		try {
-			MemcachedClient cache = new MemcachedClient(new InetSocketAddress(memcachedServer, memcachedPortal));
+			ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+			cfb.setHashAlg(DefaultHashAlgorithm.FNV1_32_HASH);
+			List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
+			InetSocketAddress rewrite = new InetSocketAddress(memcachedServer, memcachedPortal);
+			addrs.add(rewrite);
+			
+			MemcachedClient cache = new MemcachedClient(cfb.build(), addrs);
 			if (cache.get(query_key) instanceof List) {
 				@SuppressWarnings("unchecked")
 				List<String> synonyms = (ArrayList<String>)cache.get(query_key);
