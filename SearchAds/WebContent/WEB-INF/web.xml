@@ -16,6 +16,16 @@
 </context-param>
 
 <context-param>
+<param-name>ctrLogisticRegressionDataFilePath</param-name>
+<param-value>/home/jifeiqian/Projects/SearchAds/data/model/ctr_logistic_model/ctrLogisticRegression.txt</param-value>
+</context-param>
+
+<context-param>
+<param-name>ctrGBDTDataFilePath</param-name>
+<param-value>/home/jifeiqian/Projects/SearchAds/data/model/ctr_gbdt_model/ctrGbdtRegression.txt</param-value>
+</context-param>
+
+<context-param>
 <param-name>uiTemplateFilePath</param-name>
 <param-value>/home/jifeiqian/Projects/SearchAds/SearchAds/WebContent/ui.html</param-value>
 </context-param>

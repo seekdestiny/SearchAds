@@ -33,8 +33,8 @@ public class AdsServer {
 		String mysql_db = "searchads";
 		String mysql_user = "jifeiqian";
 		String mysql_pass = "Qx6y123Y@";
-		AdsEngine adsEngine = new AdsEngine(adsDataFilePath, budgetDataFilePath, memcachedServer, memcachedPortal, synonymsMemcachedPortal, 
-				mysql_host, mysql_db, mysql_user, mysql_pass);
+		AdsEngine adsEngine = new AdsEngine(adsDataFilePath,budgetDataFilePath,"","",
+				memcachedServer,memcachedPortal,11218,11219,mysql_host,mysql_db,mysql_user,mysql_pass);
 		if(adsEngine.init())
 		{
 			System.out.println("Ready to take quey");
@@ -43,7 +43,7 @@ public class AdsServer {
 				String query;				
 				while((query=br.readLine())!=null){
 					//System.out.println(query);
-					List<Ad> adsCandidates = adsEngine.selectAds(query);
+					List<Ad> adsCandidates = adsEngine.selectAds(query,"","","");
 					for(Ad ad : adsCandidates)
 					{
 						System.out.println("final selected ad id = " + ad.adId);
