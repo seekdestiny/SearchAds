@@ -33,6 +33,14 @@ python generate_synonmy.py ../../data/log/word2vec_training.txt ../../data/dedup
 python select_feature.py ../../simpleads/click_log_small.txt
 
 python store_ctr_feature.py
+
+python prepare_ctr_training_data.py /home/jifeiqian/Projects/SearchAds/simpleads/click_log_small.txt
+
+python ctr_logistic.py
+
+python ctr_gbdt.py
+
+use http://localhost:9090/SearchAds?q=home%20theater%20sysmtem&did=87843&dip=32772&qclass=Electronics
 ```
 
 ```sql
